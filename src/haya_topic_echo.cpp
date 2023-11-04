@@ -38,6 +38,7 @@
 #include "rclcpp/qos.hpp"
 #include "rmw/qos_profiles.h"
 #include "haya_imu_msgs/msg/imu_data.hpp"
+#include "sensor_msgs/msg/imu.hpp"
 
 using std::placeholders::_1;
 
@@ -50,18 +51,29 @@ public:
         auto qos = rclcpp::QoS(rclcpp::QoSInitialization(qos_profile.history, qos_profile.depth), qos_profile);
 
         // Create the synchronous subscriber on topic '/imu_data' and tie it to the topic_callback
-        haya_subscription_ = this->create_subscription<haya_imu_msgs::msg::ImuData>("/imu_data", qos, std::bind(&HayaTopicEcho::topic_callback, this, _1));                          
+        haya_subscription_ = this->create_subscription<haya_imu_msgs::msg::ImuData>("/imu_data", qos, std::bind(&HayaTopicEcho::topic_callback, this, _1)); 
+        publisher = this->create_publisher<sensor_msgs::msg::Imu>("/imu", 0);                         
     }
 
 private:
     // A subscriber that listens to topic '/imu_data'
     rclcpp::Subscription<haya_imu_msgs::msg::ImuData>::SharedPtr haya_subscription_;
+    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr publisher;
 
     /**
      * Actions to run every time a new message is received
      */
     void topic_callback(const haya_imu_msgs::msg::ImuData & imu_msg) {
-        RCLCPP_INFO_STREAM(get_logger(), haya_imu_msgs::msg::to_yaml(imu_msg));  
+        auto msg = sensor_msgs::msg::Imu();
+
+        msg.angular_velocity.x = imu_msg.angular_velocity.x;
+        msg.angular_velocity.y = imu_msg.angular_velocity.y;
+        msg.angular_velocity.z = imu_msg.angular_velocity.z;
+        msg.linear_acceleration.x = imu_msg.linear_acceleration.x;
+        msg.linear_acceleration.y = imu_msg.linear_acceleration.y;
+        msg.linear_acceleration.z = imu_msg.linear_acceleration.z;
+
+        publisher->publish(msg);
     }
 };
 
