@@ -21,4 +21,4 @@
 # - When customer receives haya_imu, please set it to calibration mode once, 
 #   calibrate it according to the manual. Then set it to normal output mode ex. 500, 250... etc.
 # - Do not support numbers or alphabets other than the above, ex. 800, a.
-    imu_mode: 250
+    imu_mode: 500
