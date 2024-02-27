@@ -1,4 +1,4 @@
-;/."""
+"""
  * haya_imu_launch.py
  *
  * License: BSD-3-Clause

@@ -1,0 +1,5 @@
+<launch>
+
+    <include file="$(find-pkg-share haya_imu_ros2)/launch/haya_imu_launch.py"/>
+    <include file="$(find-pkg-share haya_imu_ros2)/launch/haya_topic_echo_launch.py"/>
+</launch>
