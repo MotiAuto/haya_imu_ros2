@@ -39,6 +39,7 @@
 #include "rmw/qos_profiles.h"
 #include "haya_imu_msgs/msg/imu_data.hpp"
 #include "sensor_msgs/msg/imu.hpp"
+#include "geometry_msgs/msg/vector3.hpp"
 
 using std::placeholders::_1;
 
@@ -52,19 +53,21 @@ public:
 
         // Create the synchronous subscriber on topic '/imu_data' and tie it to the topic_callback
         haya_subscription_ = this->create_subscription<haya_imu_msgs::msg::ImuData>("/imu_data", qos, std::bind(&HayaTopicEcho::topic_callback, this, _1)); 
-        publisher = this->create_publisher<sensor_msgs::msg::Imu>("/imu", 0);                         
+        imu_publisher = this->create_publisher<sensor_msgs::msg::Imu>("/imu", 0);                         
     }
 
 private:
     // A subscriber that listens to topic '/imu_data'
     rclcpp::Subscription<haya_imu_msgs::msg::ImuData>::SharedPtr haya_subscription_;
-    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr publisher;
+    rclcpp::Publisher<sensor_msgs::msg::Imu>::SharedPtr imu_publisher;
+    rclcpp::Publisher<geometry_msgs::msg::Vector3>::SharedPtr mag_publisher;
 
     /**
      * Actions to run every time a new message is received
      */
     void topic_callback(const haya_imu_msgs::msg::ImuData & imu_msg) {
         auto msg = sensor_msgs::msg::Imu();
+        auto mag = geometry_msgs::msg::Vector3();
 
         msg.angular_velocity.x = imu_msg.angular_velocity.x;
         msg.angular_velocity.y = imu_msg.angular_velocity.y;
@@ -73,7 +76,12 @@ private:
         msg.linear_acceleration.y = imu_msg.linear_acceleration.y;
         msg.linear_acceleration.z = imu_msg.linear_acceleration.z;
 
-        publisher->publish(msg);
+        mag.x = imu_msg.magnetic_field.x;
+        mag.y = imu_msg.magnetic_field.y;
+        mag.z = imu_msg.magnetic_field.z;
+
+        imu_publisher->publish(msg);
+        mag_publisher->publish(mag);
     }
 };
 
