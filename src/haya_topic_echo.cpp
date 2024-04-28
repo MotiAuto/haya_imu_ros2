@@ -53,7 +53,8 @@ public:
 
         // Create the synchronous subscriber on topic '/imu_data' and tie it to the topic_callback
         haya_subscription_ = this->create_subscription<haya_imu_msgs::msg::ImuData>("/imu_data", qos, std::bind(&HayaTopicEcho::topic_callback, this, _1)); 
-        imu_publisher = this->create_publisher<sensor_msgs::msg::Imu>("/imu", 0);                         
+        imu_publisher = this->create_publisher<sensor_msgs::msg::Imu>("/imu", 0);    
+        mag_publisher = this->create_publisher<geometry_msgs::msg::Vector3>("/mag", 0);                     
     }
 
 private:
